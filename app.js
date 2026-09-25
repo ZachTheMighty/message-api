@@ -1,14 +1,14 @@
 require("dotenv").config();
 const express = require("express");
 
-const signUpRoute = require("./routes/sign_up_route.js");
+const usersRoute = require("./routes/users_route.js");
 const logInRoute = require("./routes/log_in_route.js");
 
 const app = express();
 
 app.use(express.json());
 
-app.use("/users", signUpRoute);
+app.use("/users", usersRoute);
 app.use("/tokens", logInRoute);
 
 app.get("/", (req, res) =>
