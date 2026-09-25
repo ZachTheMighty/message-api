@@ -1,15 +1,11 @@
 const prisma = require("../lib/prisma.ts");
 const validateSignUp = require("../middlewares/validate_sign_up.js");
-const { matchedData, validationResult } = require("express-validator");
+const { matchedData } = require("express-validator");
 const bcrypt = require("bcryptjs");
 
 const createUser = [
   validateSignUp,
   async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty())
-      return res.status(422).json({ errors: errors.array() });
-
     const { firstName, lastName, email, password } = matchedData(req);
 
     if (
