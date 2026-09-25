@@ -2,6 +2,15 @@ const prisma = require("../lib/prisma.ts");
 const validateSignUp = require("../middlewares/validate_sign_up.js");
 const { matchedData } = require("express-validator");
 const bcrypt = require("bcryptjs");
+const authenticateUser = require("../middlewares/authenticate.js");
+
+const getAllUsers = [
+  authenticateUser,
+  async (req, res) => {
+    const users = await prisma.user.findMany();
+    res.json(users);
+  },
+];
 
 const createUser = [
   validateSignUp,
@@ -29,4 +38,4 @@ const createUser = [
   },
 ];
 
-module.exports = { createUser };
+module.exports = { createUser, getAllUsers };
