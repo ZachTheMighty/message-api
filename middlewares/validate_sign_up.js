@@ -1,4 +1,5 @@
-const { body, validationResult } = require("express-validator");
+const { body } = require("express-validator");
+const validateResult = require("./validate_result.js");
 
 const emptyMessage = "This field can't be empty.";
 const alphaMessage = "Name can't contains numbers, symbols or whitespaces.";
@@ -60,10 +61,5 @@ module.exports = [
     .withMessage(passwordLengthMessage)
     .custom((value, { req }) => value === req.body.password)
     .withMessage("The two passwords must match."),
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty())
-      return res.status(422).json({ errors: errors.array() });
-    next();
-  },
+  validateResult,
 ];
