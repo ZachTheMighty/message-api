@@ -12,6 +12,15 @@ const createUser = [
 
     const { firstName, lastName, email, password } = matchedData(req);
 
+    if (
+      await prisma.user.findUnique({
+        where: { email },
+      })
+    )
+      return res
+        .status(422)
+        .json({ errors: "An account with this email already exists." });
+
     const user = await prisma.user.create({
       data: {
         firstName,
