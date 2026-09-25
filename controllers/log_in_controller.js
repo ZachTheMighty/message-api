@@ -15,7 +15,7 @@ const createToken = [
     });
 
     if (!user)
-      res.status(401).json({ errors: "Incorrect email", path: "email" });
+      return res.status(401).json({ errors: "Incorrect email", path: "email" });
 
     if (!(await bcrypt.compare(password, user.password)))
       return res
