@@ -1,18 +1,21 @@
-const authenticateUser = require("../middlewares/authenticate.js");
 const prisma = require("../lib/prisma.ts");
 
-const createChat = [
-  authenticateUser,
-  async (req, res) => {
-    const chat = await prisma.chat.create({
-      data: {
-        users: {
-          connect: [{ id: req.payload.user.id }, { id: req.params.userId }],
-        },
-      },
-    });
-    res.json(chat);
-  },
-];
+const getChatById = async (req, res) => {
+  const chat = await prisma.chat.findMany({
+    where: { id: +req.params.chatId },
+    include: { users: true, messages: true },
+  });
+  res.json(chat);
+};
 
-module.exports = { createChat };
+const createChat = async (req, res) => {
+  const chat = await prisma.chat.create({
+    data: {
+      users: {
+        connect: [{ id: req.payload.user.id }, { id: +req.params.userId }],
+      },
+    },
+  });
+  res.json(chat);
+};
+module.exports = { createChat, getChatById };
