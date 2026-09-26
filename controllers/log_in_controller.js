@@ -25,7 +25,7 @@ const createToken = [
     jwt.sign(
       { user },
       process.env.SECRET,
-      { expiresIn: "15m" },
+      { expiresIn: "30d" },
       (error, token) => res.json({ token }),
     );
   },

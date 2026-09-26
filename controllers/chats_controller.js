@@ -18,4 +18,25 @@ const createChat = async (req, res) => {
   });
   res.json(chat);
 };
-module.exports = { createChat, getChatById };
+
+const createMessage = async (req, res) => {
+  if (
+    !(await prisma.chat.findUnique({
+      where: { id: +req.params.chatId },
+    }))
+  )
+    return res
+      .status(404)
+      .json({ errors: "Can't create message under non existent chat." });
+
+  const message = await prisma.message.create({
+    data: {
+      userId: +req.body.userId,
+      chatId: +req.params.chatId,
+      content: req.body.content,
+    },
+  });
+  res.json(message);
+};
+
+module.exports = { createChat, getChatById, createMessage };
