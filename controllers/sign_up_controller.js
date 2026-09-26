@@ -23,7 +23,7 @@ const createUser = [
       })
     )
       return res
-        .status(422)
+        .status(409)
         .json({ errors: "An account with this email already exists." });
 
     const user = await prisma.user.create({
