@@ -24,6 +24,8 @@ app.get("/", (req, res) =>
   }),
 );
 
+app.use((req, res) => res.json({ errors: "invalid endpoint" }));
+
 const port = process.env.PORT;
 
 app.listen(port, (error) => {
