@@ -9,6 +9,7 @@ const app = express();
 
 app.use(require("cors")());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use("/users", usersRoute);
 app.use("/tokens", logInRoute);
