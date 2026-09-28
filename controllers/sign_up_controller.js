@@ -13,7 +13,7 @@ const getAllUsers = [
   authenticateUser,
   async (req, res) => {
     const users = await prisma.user.findMany();
-    res.json(users);
+    res.json({ users, loggedInUser: req.payload.user });
   },
 ];
 
