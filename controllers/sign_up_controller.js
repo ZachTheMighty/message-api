@@ -26,12 +26,12 @@ const createUser = [
       process.env.SUPABASE_KEY,
     );
 
+    const filePath = `${Date.now()}_${req.file.originalname}`;
+
     try {
-      console.log(req.file);
-      console.log(req.filePath);
       const { error } = await supabase.storage
         .from("files")
-        .upload(`${Date.now()}_${req.file.originalname}`, req.file.buffer, {
+        .upload(filePath, req.file.buffer, {
           contentType: req.file.mimetype,
           upsert: false,
         });
@@ -55,9 +55,8 @@ const createUser = [
       data: {
         firstName,
         lastName,
-        photo: supabase.storage
-          .from("files")
-          .getPublicUrl(req.file.originalname).data.publicUrl,
+        photo: supabase.storage.from("files").getPublicUrl(filePath).data
+          .publicUrl,
         email,
         password: await bcrypt.hash(password, 10),
       },
