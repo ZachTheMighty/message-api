@@ -1,8 +1,8 @@
 const prisma = require("../lib/prisma.ts");
 const validateSignUp = require("../middlewares/validate_sign_up.js");
+const validateUser = require("../middlewares/validate_user.js");
 const { matchedData } = require("express-validator");
 const bcrypt = require("bcryptjs");
-const authenticateUser = require("../middlewares/authenticate.js");
 require("dotenv").config();
 
 const multer = require("multer");
@@ -10,10 +10,12 @@ const upload = multer({ storage: multer.memoryStorage() });
 const { createClient } = require("@supabase/supabase-js");
 
 const getAllUsers = [
-  authenticateUser,
   async (req, res) => {
     const users = await prisma.user.findMany();
-    res.json({ users, loggedInUser: req.payload.user });
+    const loggedInUser = await prisma.user.findUnique({
+      where: { id: req.payload.user.id },
+    });
+    res.json({ users, loggedInUser });
   },
 ];
 
@@ -65,4 +67,19 @@ const createUser = [
   },
 ];
 
-module.exports = { createUser, getAllUsers };
+const updateUserById = [
+  validateUser,
+  async (req, res) => {
+    const { firstName, lastName } = matchedData(req);
+    const updatedUser = await prisma.user.update({
+      where: { id: +req.params.userId },
+      data: {
+        firstName,
+        lastName,
+      },
+    });
+    res.json(updatedUser);
+  },
+];
+
+module.exports = { createUser, getAllUsers, updateUserById };
