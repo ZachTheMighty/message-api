@@ -3,11 +3,7 @@ const validateSignUp = require("../middlewares/validate_sign_up.js");
 const validateUser = require("../middlewares/validate_user.js");
 const { matchedData } = require("express-validator");
 const bcrypt = require("bcryptjs");
-require("dotenv").config();
-
-const multer = require("multer");
-const upload = multer({ storage: multer.memoryStorage() });
-const { createClient } = require("@supabase/supabase-js");
+const uploadImage = require("../middlewares/upload_image.js");
 
 const getAllUsers = [
   async (req, res) => {
@@ -20,28 +16,9 @@ const getAllUsers = [
 ];
 
 const createUser = [
-  upload.single("file"),
+  uploadImage,
   validateSignUp,
   async (req, res) => {
-    const supabase = createClient(
-      process.env.SUPABASE_URL,
-      process.env.SUPABASE_KEY,
-    );
-
-    const filePath = `${Date.now()}_${req.file.originalname}`;
-
-    try {
-      const { error } = await supabase.storage
-        .from("files")
-        .upload(filePath, req.file.buffer, {
-          contentType: req.file.mimetype,
-          upsert: false,
-        });
-      if (error) throw error;
-    } catch (error) {
-      throw error;
-    }
-
     const { firstName, lastName, email, password } = matchedData(req);
 
     if (
@@ -57,8 +34,7 @@ const createUser = [
       data: {
         firstName,
         lastName,
-        photo: supabase.storage.from("files").getPublicUrl(filePath).data
-          .publicUrl,
+        photo: req.imageUrl,
         email,
         password: await bcrypt.hash(password, 10),
       },
@@ -68,6 +44,7 @@ const createUser = [
 ];
 
 const updateUserById = [
+  uploadImage,
   validateUser,
   async (req, res) => {
     const { firstName, lastName } = matchedData(req);
@@ -76,6 +53,7 @@ const updateUserById = [
       data: {
         firstName,
         lastName,
+        photo: req.imageUrl,
       },
     });
     res.json(updatedUser);
