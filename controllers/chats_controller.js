@@ -1,4 +1,5 @@
 const prisma = require("../lib/prisma.ts");
+const validateMessage = require("../middlewares/validate_message.js");
 
 const getChatById = async (req, res) => {
   const chat = await prisma.chat.findUnique({
@@ -19,24 +20,27 @@ const createChat = async (req, res) => {
   res.json(chat);
 };
 
-const createMessage = async (req, res) => {
-  if (
-    !(await prisma.chat.findUnique({
-      where: { id: +req.params.chatId },
-    }))
-  )
-    return res
-      .status(404)
-      .json({ errors: "Can't create message under non existent chat." });
+const createMessage = [
+  validateMessage,
+  async (req, res) => {
+    if (
+      !(await prisma.chat.findUnique({
+        where: { id: +req.params.chatId },
+      }))
+    )
+      return res
+        .status(404)
+        .json({ errors: "Can't create message under non existent chat." });
 
-  const message = await prisma.message.create({
-    data: {
-      userId: +req.body.userId,
-      chatId: +req.params.chatId,
-      content: req.body.content,
-    },
-  });
-  res.json(message);
-};
+    const message = await prisma.message.create({
+      data: {
+        userId: +req.body.userId,
+        chatId: +req.params.chatId,
+        content: req.body.content,
+      },
+    });
+    res.json(message);
+  },
+];
 
 module.exports = { createChat, getChatById, createMessage };
