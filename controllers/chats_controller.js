@@ -1,7 +1,7 @@
 const prisma = require("../lib/prisma.ts");
 
 const getChatById = async (req, res) => {
-  const chat = await prisma.chat.findMany({
+  const chat = await prisma.chat.findUnique({
     where: { id: +req.params.chatId },
     include: { users: true, messages: true },
   });
