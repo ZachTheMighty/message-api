@@ -1,6 +1,13 @@
 const prisma = require("../lib/prisma.ts");
 const validateMessage = require("../middlewares/validate_message.js");
 
+const getAllChats = async (req, res) => {
+  const chats = await prisma.chat.findMany({
+    include: { users: true, messages: true },
+  });
+  res.json(chats);
+};
+
 const getChatById = async (req, res) => {
   const chat = await prisma.chat.findUnique({
     where: { id: +req.params.chatId },
@@ -43,4 +50,4 @@ const createMessage = [
   },
 ];
 
-module.exports = { createChat, getChatById, createMessage };
+module.exports = { createChat, getChatById, createMessage, getAllChats };
