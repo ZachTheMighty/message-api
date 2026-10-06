@@ -17,12 +17,22 @@ const getChatById = async (req, res) => {
 };
 
 const createChat = async (req, res) => {
+  const chatExists = await prisma.chat.findUnique({
+    where: {
+      id: +req.params.chatId,
+    },
+    include: { users: true, messages: true },
+  });
+
+  if (chatExists) return res.json(chatExists);
+
   const chat = await prisma.chat.create({
     data: {
       users: {
-        connect: [{ id: req.payload.user.id }, { id: +req.params.userId }],
+        connect: [{ id: req.payload.user.id }, { id: req.body.userId }],
       },
     },
+    include: { users: true, messages: true },
   });
   res.json(chat);
 };
