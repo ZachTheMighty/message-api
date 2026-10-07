@@ -52,8 +52,8 @@ const createMessage = [
 
     await prisma.message.create({
       data: {
-        userId: req.payload.user.id,
-        chatId: +req.params.chatId,
+        user: { connect: { id: req.payload.user.id } },
+        chat: { connect: { id: +req.params.chatId } },
         content: req.body.content,
       },
     });
