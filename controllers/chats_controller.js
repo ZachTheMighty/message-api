@@ -66,4 +66,21 @@ const createMessage = [
   },
 ];
 
-module.exports = { createChat, getChatById, createMessage, getAllChats };
+const deleteMessageById = async (req, res) => {
+  const message = await prisma.message.findUnique({
+    where: { id: +req.params.messageId },
+  });
+  if (!message)
+    return res.json({ errors: "Can't delete non existent message" });
+  res.json(
+    await prisma.message.delete({ where: { id: +req.params.messageId } }),
+  );
+};
+
+module.exports = {
+  createChat,
+  getChatById,
+  createMessage,
+  getAllChats,
+  deleteMessageById,
+};

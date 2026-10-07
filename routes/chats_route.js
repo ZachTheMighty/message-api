@@ -7,5 +7,6 @@ route.get("/", controller.getAllChats);
 route.get("/:chatId", controller.getChatById);
 route.post("/:chatId", controller.createChat);
 route.post("/:chatId/messages", controller.createMessage);
+route.delete("/:chatId/messages/:messageId", controller.deleteMessageById);
 
 module.exports = route;
