@@ -16,7 +16,7 @@ const getChatById = async (req, res) => {
   res.json(chat);
 };
 
-const createChat = async (req, res) => {
+const createChat = async (req, res, next) => {
   const chatExists = await prisma.chat.findUnique({
     where: {
       id: +req.params.chatId,
@@ -24,9 +24,9 @@ const createChat = async (req, res) => {
     include: { users: true, messages: true },
   });
 
-  if (chatExists) return res.json(chatExists);
+  if (chatExists) return next();
 
-  const chat = await prisma.chat.create({
+  await prisma.chat.create({
     data: {
       users: {
         connect: [{ id: req.payload.user.id }, { id: req.body.userId }],
@@ -34,10 +34,11 @@ const createChat = async (req, res) => {
     },
     include: { users: true, messages: true },
   });
-  res.json(chat);
+  next();
 };
 
 const createMessage = [
+  createChat,
   validateMessage,
   async (req, res) => {
     if (
@@ -49,14 +50,19 @@ const createMessage = [
         .status(404)
         .json({ errors: "Can't create message under non existent chat." });
 
-    const message = await prisma.message.create({
+    await prisma.message.create({
       data: {
-        userId: +req.body.userId,
+        userId: req.payload.user.id,
         chatId: +req.params.chatId,
         content: req.body.content,
       },
     });
-    res.json(message);
+    res.json(
+      await prisma.chat.findUnique({
+        where: { id: +req.params.chatId },
+        include: { users: true, messages: true },
+      }),
+    );
   },
 ];
 
